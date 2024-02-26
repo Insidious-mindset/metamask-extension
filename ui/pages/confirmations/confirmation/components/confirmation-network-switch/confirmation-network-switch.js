@@ -17,7 +17,7 @@ import {
   NETWORK_TO_NAME_MAP,
 } from '../../../../../../shared/constants/network';
 
-const getNetworkDetails = (network) => {
+export const getNetworkDetails = (network) => {
   return {
     ...network,
     nickname: network.nickname ?? NETWORK_TO_NAME_MAP[network.chainId],

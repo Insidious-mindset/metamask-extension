@@ -2,6 +2,7 @@ import { InvisibleCharacter } from '../../components/component-library';
 import {
   GOERLI_DISPLAY_NAME,
   LINEA_GOERLI_DISPLAY_NAME,
+  PALM_DISPLAY_NAME,
   SEPOLIA_DISPLAY_NAME,
 } from '../../../shared/constants/network';
 import { BackgroundColor } from '../constants/design-system';
@@ -62,6 +63,8 @@ export function getAvatarNetworkColor(name) {
       return BackgroundColor.lineaGoerli;
     case SEPOLIA_DISPLAY_NAME:
       return BackgroundColor.sepolia;
+    case PALM_DISPLAY_NAME:
+      return BackgroundColor.palmNetwork;
     default:
       return undefined;
   }

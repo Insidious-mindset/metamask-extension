@@ -90,6 +90,7 @@ const NetworksListItem = ({
           className="networks-tab__content__custom-image"
           diameter={24}
           image={CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP[network.chainId]}
+          alt="network-icon"
           imageBorder
         />
       ) : (

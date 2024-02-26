@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConfirmationNetworkSwitch should match snapshot 1`] = `
+<div>
+  <div
+    class="mm-box confirmation-network-switch mm-box--margin-top-8 mm-box--display-flex mm-box--justify-content-center mm-box--height-full"
+  >
+    <div
+      class="mm-box confirmation-network-switch__icon mm-box--display-block"
+    >
+      <div
+        class="mm-box mm-text mm-avatar-base mm-avatar-base--size-xl mm-avatar-network mm-text--body-lg-medium mm-text--text-transform-uppercase mm-box--margin-bottom-2 mm-box--display-flex mm-box--justify-content-center mm-box--align-items-center mm-box--color-text-default mm-box--background-color-background-alternative mm-box--rounded-full mm-box--border-color-transparent box--border-style-solid box--border-width-1"
+      >
+        E
+      </div>
+      <p
+        class="mm-box mm-text mm-text--body-md mm-box--display-flex mm-box--justify-content-center mm-box--color-text-default"
+        data-testid="network-switch-from-network"
+      >
+        Ethereum
+      </p>
+    </div>
+    <div
+      class="mm-box confirmation-network-switch__center-icon mm-box--display-flex mm-box--justify-content-center mm-box--align-items-center"
+    >
+      <i
+        class="fa fa-angle-right fa-lg confirmation-network-switch__check"
+      />
+      <div
+        class="confirmation-network-switch__dashed-line"
+      />
+    </div>
+    <div
+      class="mm-box confirmation-network-switch__icon mm-box--display-block"
+    >
+      <div
+        class="mm-box mm-text mm-avatar-base mm-avatar-base--size-xl mm-avatar-network mm-text--body-lg-medium mm-text--text-transform-uppercase mm-box--margin-bottom-2 mm-box--display-flex mm-box--justify-content-center mm-box--align-items-center mm-box--color-text-default mm-box--background-color-background-alternative mm-box--rounded-full mm-box--border-color-transparent box--border-style-solid box--border-width-1"
+      >
+        P
+      </div>
+      <p
+        class="mm-box mm-text mm-text--body-md mm-box--display-flex mm-box--justify-content-center mm-box--color-text-default"
+        data-testid="network-switch-to-network"
+      >
+        Polygon
+      </p>
+    </div>
+  </div>
+</div>
+`;

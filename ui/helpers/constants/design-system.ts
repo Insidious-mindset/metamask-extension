@@ -55,6 +55,7 @@ export enum Color {
   inherit = 'inherit',
   goerliInverse = 'goerli-inverse',
   sepoliaInverse = 'sepolia-inverse',
+  palmNetwork = 'palm-network',
 }
 
 export enum BackgroundColor {
@@ -83,6 +84,7 @@ export enum BackgroundColor {
   lineaMainnet = 'linea-mainnet',
   transparent = 'transparent',
   localhost = 'localhost',
+  palmNetwork = 'palm-network',
 }
 
 export enum BorderColor {
@@ -111,6 +113,7 @@ export enum BorderColor {
   transparent = 'transparent',
   localhost = 'localhost',
   backgroundDefault = 'background-default', // exception for border color when element is meant to look "cut out"
+  palmNetwork = 'palm-network',
 }
 
 export enum TextColor {
@@ -138,6 +141,7 @@ export enum TextColor {
   goerliInverse = 'goerli-inverse',
   sepoliaInverse = 'sepolia-inverse',
   transparent = 'transparent',
+  palmNetwork = 'palm-network',
 }
 
 export enum IconColor {
@@ -165,6 +169,7 @@ export enum IconColor {
   goerliInverse = 'goerli-inverse',
   sepoliaInverse = 'sepolia-inverse',
   transparent = 'transparent',
+  palmNetwork = 'palm-network',
 }
 
 export enum TypographyVariant {

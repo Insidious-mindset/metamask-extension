@@ -37,6 +37,7 @@ export const ValidColors = [
   Color.lineaGoerliInverse,
   Color.lineaMainnet,
   Color.lineaMainnetInverse,
+  Color.palmNetwork,
 ];
 
 export const ValidTags = [

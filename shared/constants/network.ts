@@ -360,7 +360,7 @@ export const AETH_TOKEN_IMAGE_URL = './images/arbitrum.svg';
 export const FTM_TOKEN_IMAGE_URL = './images/fantom-opera.svg';
 export const HARMONY_ONE_TOKEN_IMAGE_URL = './images/harmony-one.svg';
 export const OPTIMISM_TOKEN_IMAGE_URL = './images/optimism.svg';
-export const PALM_TOKEN_IMAGE_URL = './images/palm.svg';
+export const PALM_TOKEN_IMAGE_URL_WHITE = './images/palm-white.svg';
 export const CELO_TOKEN_IMAGE_URL = './images/celo.svg';
 export const GNOSIS_TOKEN_IMAGE_URL = './images/gnosis.svg';
 export const ZK_SYNC_ERA_TOKEN_IMAGE_URL = './images/zk-sync.svg';
@@ -650,7 +650,7 @@ export const CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP = {
   [CHAIN_IDS.FANTOM]: FTM_TOKEN_IMAGE_URL,
   [CHAIN_IDS.HARMONY]: HARMONY_ONE_TOKEN_IMAGE_URL,
   [CHAIN_IDS.OPTIMISM]: OPTIMISM_TOKEN_IMAGE_URL,
-  [CHAIN_IDS.PALM]: PALM_TOKEN_IMAGE_URL,
+  [CHAIN_IDS.PALM]: PALM_TOKEN_IMAGE_URL_WHITE,
   [CHAIN_IDS.CELO]: CELO_TOKEN_IMAGE_URL,
   [CHAIN_IDS.GNOSIS]: GNOSIS_TOKEN_IMAGE_URL,
   [CHAINLIST_CHAIN_IDS_MAP.ACALA_NETWORK]: ACALA_TOKEN_IMAGE_URL,

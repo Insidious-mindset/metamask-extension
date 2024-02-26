@@ -5,6 +5,7 @@ import mockState from '../../test/data/mock-state.json';
 import { KeyringType } from '../../shared/constants/keyring';
 import {
   CHAIN_IDS,
+  CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP,
   LOCALHOST_DISPLAY_NAME,
   NETWORK_TYPES,
   OPTIMISM_DISPLAY_NAME,
@@ -325,6 +326,59 @@ describe('Selectors', () => {
           },
         }),
       ).toStrictEqual({ blockExplorerUrl: 'https://test-block-explorer' });
+    });
+  });
+
+  describe('#getNonTestNetworks', () => {
+    it('includes predefined networks with correct properties', () => {
+      const result = selectors.getNonTestNetworks({
+        metamask: {
+          networkConfigurations: null,
+          theme: 'light',
+        },
+      });
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          chainId: CHAIN_IDS.MAINNET,
+          providerType: NETWORK_TYPES.MAINNET,
+          removable: false,
+        }),
+      );
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          chainId: CHAIN_IDS.LINEA_MAINNET,
+          providerType: NETWORK_TYPES.LINEA_MAINNET,
+          removable: false,
+        }),
+      );
+    });
+
+    it('includes custom networks excluding localhost and assigns correct image URLs for light mode', () => {
+      const customNetworks = {
+        123: {
+          chainId: '0x2a15c308d',
+          nickname: 'Custom Network',
+          rpcUrl: 'http://custom.network',
+          rpcPrefs: {},
+        },
+      };
+
+      const result = selectors.getNonTestNetworks({
+        metamask: {
+          networkConfigurations: customNetworks,
+          theme: 'light',
+        },
+      });
+
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          chainId: '0x2a15c308d',
+          rpcPrefs: {
+            imageUrl: CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP['0x2a15c308d'],
+          },
+          removable: true,
+        }),
+      );
     });
   });
 
