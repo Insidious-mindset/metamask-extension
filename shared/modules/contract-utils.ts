@@ -1,12 +1,13 @@
 import pify from 'pify';
+import { TransactionType } from '@metamask/transaction-controller';
 
 export type Contract = {
-  contractCode: string | null;
+  contractCode: TransactionType | null;
   isContractAddress: boolean;
 };
 
 // Note(@dbrans): This is a simplified version of the 'EthQuery' interface specific to this file.
-type EthQueryWithGetCode = {
+export type EthQueryWithGetCode = {
   getCode: (
     address: string,
     cb: (err: Error, contractCode: string) => void,
@@ -15,9 +16,9 @@ type EthQueryWithGetCode = {
 
 export const readAddressAsContract = async (
   ethQuery: EthQueryWithGetCode,
-  address: string,
+  address: string | undefined,
 ): Promise<Contract> => {
-  let contractCode: string | null;
+  let contractCode: TransactionType | null;
   try {
     contractCode = await pify(ethQuery.getCode.bind(ethQuery))(address);
   } catch (err) {

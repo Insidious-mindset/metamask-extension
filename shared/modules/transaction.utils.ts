@@ -1,36 +1,43 @@
 import { isHexString } from 'ethereumjs-util';
-import { Interface } from '@ethersproject/abi';
+import { Interface, FunctionFragment } from '@ethersproject/abi';
+import { BigNumber } from '@ethersproject/bignumber';
 import { abiERC721, abiERC20, abiERC1155 } from '@metamask/metamask-eth-abis';
 import log from 'loglevel';
-import { TransactionType } from '@metamask/transaction-controller';
+import {
+  TransactionMeta,
+  TransactionType,
+} from '@metamask/transaction-controller';
+import { TransactionParams } from '@metamask/transaction-controller/dist/types';
+import { Result } from '@ethersproject/abi/src.ts/coders/abstract-coder';
 import { AssetType, TokenStandard } from '../constants/transaction';
-import { readAddressAsContract } from './contract-utils';
+import { EthQueryWithGetCode, readAddressAsContract } from './contract-utils';
 import { isEqualCaseInsensitive } from './string-utils';
 
-/**
- * @typedef { 'transfer' | 'approve' | 'setapprovalforall' | 'transferfrom' | 'contractInteraction'| 'simpleSend' } InferrableTransactionTypes
- */
+const INFERRABLE_TRANSACTION_TYPES: TransactionType[] = [
+  TransactionType.tokenMethodApprove,
+  TransactionType.tokenMethodSetApprovalForAll,
+  TransactionType.tokenMethodTransfer,
+  TransactionType.tokenMethodTransferFrom,
+  TransactionType.contractInteraction,
+  TransactionType.simpleSend,
+];
 
-/**
- * @typedef {object} InferTransactionTypeResult
- * @property {InferrableTransactionTypes} type - The type of transaction
- * @property {string} getCodeResponse - The contract code, in hex format if
- *  it exists. '0x0' or '0x' are also indicators of non-existent contract
- *  code
- */
+type InferTransactionTypeResult = {
+  // The type of transaction
+  type: TransactionType;
+  // The contract code, in hex format if it exists. '0x0' or '0x' are also indicators of non-existent contract code
+  getCodeResponse: string | null;
+};
 
-/**
- * @typedef EthersContractCall
- * @type object
- * @property {any[]} args - The args/params to the function call.
- * An array-like object with numerical and string indices.
- * @property {string} name - The name of the function.
- * @property {string} signature - The function signature.
- * @property {string} sighash - The function signature hash.
- * @property {EthersBigNumber} value - The ETH value associated with the call.
- * @property {FunctionFragment} functionFragment - The Ethers function fragment
- * representation of the function.
- */
+// same as TransactionDescription from @ethersproject/abi/src.ts/interface.ts
+type TransactionDescription = {
+  args: Result; // The args/params to the function call. An array-like object with numerical and string indices.
+  name: string; // The name of the function.
+  signature: string; // The function signature.
+  sighash: string; // The function signature hash.
+  value: BigNumber; // The ETH value associated with the call.
+  functionFragment: FunctionFragment; // The Ethers function fragment representation of the function.
+};
 
 const erc20Interface = new Interface(abiERC20);
 const erc721Interface = new Interface(abiERC721);
@@ -40,14 +47,15 @@ const erc1155Interface = new Interface(abiERC1155);
  * Determines if the maxFeePerGas and maxPriorityFeePerGas fields are supplied
  * and valid inputs. This will return false for non hex string inputs.
  *
- * @param {import('@metamask/transaction-controller').TransactionMeta} transaction -
- *  the transaction to check
- * @returns {boolean} true if transaction uses valid EIP1559 fields
+ * @param transactionMeta - the transaction to check
+ * @returns boolean true if transaction uses valid EIP1559 fields
  */
-export function isEIP1559Transaction(transaction) {
+export function isEIP1559Transaction(
+  transactionMeta: TransactionMeta,
+): boolean {
   return (
-    isHexString(transaction?.txParams?.maxFeePerGas) &&
-    isHexString(transaction?.txParams?.maxPriorityFeePerGas)
+    isHexString(transactionMeta?.txParams?.maxFeePerGas as string) &&
+    isHexString(transactionMeta?.txParams?.maxPriorityFeePerGas as string)
   );
 }
 
@@ -56,38 +64,38 @@ export function isEIP1559Transaction(transaction) {
  * supplied and that the gasPrice field is valid if it is provided. This will
  * return false if gasPrice is a non hex string.
  *
- * @param {import('@metamask/transaction-controller').TransactionMeta} transaction -
- *  the transaction to check
- * @returns {boolean} true if transaction uses valid Legacy fields OR lacks
- *  EIP1559 fields
+ * @param transactionMeta - the transaction to check
+ * @returns boolean true if transaction uses valid Legacy fields OR lacks EIP1559 fields
  */
-export function isLegacyTransaction(transaction) {
+export function isLegacyTransaction(transactionMeta: TransactionMeta): boolean {
   return (
-    typeof transaction.txParams.maxFeePerGas === 'undefined' &&
-    typeof transaction.txParams.maxPriorityFeePerGas === 'undefined' &&
-    (typeof transaction.txParams.gasPrice === 'undefined' ||
-      isHexString(transaction.txParams.gasPrice))
+    typeof transactionMeta.txParams.maxFeePerGas === 'undefined' &&
+    typeof transactionMeta.txParams.maxPriorityFeePerGas === 'undefined' &&
+    (typeof transactionMeta.txParams.gasPrice === 'undefined' ||
+      isHexString(transactionMeta.txParams.gasPrice))
   );
 }
 
 /**
  * Determine if a transactions gas fees in txParams match those in its dappSuggestedGasFees property
  *
- * @param {import('@metamask/transaction-controller').TransactionMeta} transaction -
- *  the transaction to check
- * @returns {boolean} true if both the txParams and dappSuggestedGasFees are objects with truthy gas fee properties,
- *   and those properties are strictly equal
+ * @param  transactionMeta - the transaction to check
+ * @returns boolean - true if both the txParams and dappSuggestedGasFees are objects with truthy gas fee properties,
+ * and those properties are strictly equal
  */
-export function txParamsAreDappSuggested(transaction) {
+export function txParamsAreDappSuggested(
+  transactionMeta: TransactionMeta,
+): boolean {
   const { gasPrice, maxPriorityFeePerGas, maxFeePerGas } =
-    transaction?.txParams || {};
+    transactionMeta?.txParams || {};
   return (
-    (gasPrice && gasPrice === transaction?.dappSuggestedGasFees?.gasPrice) ||
+    (gasPrice &&
+      gasPrice === transactionMeta?.dappSuggestedGasFees?.gasPrice) ||
     (maxPriorityFeePerGas &&
       maxFeePerGas &&
-      transaction?.dappSuggestedGasFees?.maxPriorityFeePerGas ===
+      transactionMeta?.dappSuggestedGasFees?.maxPriorityFeePerGas ===
         maxPriorityFeePerGas &&
-      transaction?.dappSuggestedGasFees?.maxFeePerGas === maxFeePerGas)
+      transactionMeta?.dappSuggestedGasFees?.maxFeePerGas === maxFeePerGas)
   );
 }
 
@@ -97,9 +105,11 @@ export function txParamsAreDappSuggested(transaction) {
  * contract standards
  *
  * @param data - encoded transaction data
- * @returns {EthersContractCall | undefined}
+ * @returns TransactionDescription | undefined
  */
-export function parseStandardTokenTransactionData(data) {
+export function parseStandardTokenTransactionData(
+  data: string,
+): TransactionDescription | undefined {
   try {
     return erc20Interface.parseTransaction({ data });
   } catch {
@@ -124,12 +134,14 @@ export function parseStandardTokenTransactionData(data) {
 /**
  * Determines the contractCode of the transaction by analyzing the txParams.
  *
- * @param {object} txParams - Parameters for the transaction
- * @param {EthQuery} query - EthQuery instance
- * @returns {InferTransactionTypeResult}
+ * @param txParams - Parameters for the transaction
+ * @param query - EthQuery instance
  */
-export async function determineTransactionContractCode(txParams, query) {
-  const { to } = txParams;
+export async function determineTransactionContractCode(
+  txParams: TransactionParams,
+  query: EthQueryWithGetCode,
+): Promise<TransactionType | null> {
+  const { to } = txParams<TransactionParams>;
   const { contractCode } = await readAddressAsContract(query, to);
   return contractCode;
 }
@@ -141,14 +153,17 @@ export async function determineTransactionContractCode(txParams, query) {
  * represent specific events that we control from the extension and are added manually
  * at transaction creation.
  *
- * @param {object} txParams - Parameters for the transaction
- * @param {EthQuery} query - EthQuery instance
- * @returns {Promise<InferTransactionTypeResult>}
+ * @param txParams - Parameters for the transaction
+ * @param query - EthQuery instance
+ * @returns InferTransactionTypeResult
  */
-export async function determineTransactionType(txParams, query) {
+export async function determineTransactionType(
+  txParams: TransactionParams,
+  query: EthQueryWithGetCode,
+): Promise<InferTransactionTypeResult> {
   const { data, to } = txParams;
-  let result;
-  let contractCode;
+  let result: TransactionType;
+  let contractCode: string | null;
 
   if (data && !to) {
     result = TransactionType.deployContract;
@@ -161,9 +176,12 @@ export async function determineTransactionType(txParams, query) {
     if (isContractAddress) {
       const hasValue = txParams.value && Number(txParams.value) !== 0;
 
-      let name;
+      let name: string = '';
       try {
-        ({ name } = data && parseStandardTokenTransactionData(data));
+        const decodedData = data && parseStandardTokenTransactionData(data);
+        if ('name' in decodedData) {
+          name = decodedData.name;
+        }
       } catch (error) {
         log.debug('Failed to parse transaction data.', error, data);
       }
@@ -188,36 +206,34 @@ export async function determineTransactionType(txParams, query) {
   return { type: result, getCodeResponse: contractCode };
 }
 
-const INFERRABLE_TRANSACTION_TYPES = [
-  TransactionType.tokenMethodApprove,
-  TransactionType.tokenMethodSetApprovalForAll,
-  TransactionType.tokenMethodTransfer,
-  TransactionType.tokenMethodTransferFrom,
-  TransactionType.contractInteraction,
-  TransactionType.simpleSend,
-];
-
+type getTokenStandardAndDetails = (to) => () => {
+  decimals?: string;
+  balance?: string;
+  symbol?: string;
+  standard?: TokenStandard;
+};
 /**
  * Given a transaction meta object, determine the asset type that the
  * transaction is dealing with, as well as the standard for the token if it
  * is a token transaction.
  *
- * @param {import('@metamask/transaction-controller').TransactionMeta} txMeta -
- *  transaction meta object
- * @param {EthQuery} query - EthQuery instance
- * @param {Function} getTokenStandardAndDetails - function to get token
- *  standards and details.
- * @returns {{ assetType: string, tokenStandard: string}}
+ * @param txMeta - transaction meta object
+ * @param query - EthQuery instance
+ * @param getTokenStandardAndDetails - function to get token standards and details.
+ * @returns assetType: AssetType, tokenStandard: TokenStandard
  */
 export async function determineTransactionAssetType(
-  txMeta,
-  query,
-  getTokenStandardAndDetails,
-) {
+  txMeta: TransactionMeta,
+  query: EthQueryWithGetCode,
+  getTokenStandardAndDetails: getTokenStandardAndDetails,
+): Promise<{
+  assetType: AssetType;
+  tokenStandard: TokenStandard;
+}> {
   // If the transaction type is already one of the inferrable types, then we do
   // not need to re-establish the type.
   let inferrableType = txMeta.type;
-  if (INFERRABLE_TRANSACTION_TYPES.includes(txMeta.type) === false) {
+  if (!INFERRABLE_TRANSACTION_TYPES.includes(txMeta.type as TransactionType)) {
     // Because we will deal with all types of transactions (including swaps)
     // we want to get an inferrable type of transaction that isn't special cased
     // that way we can narrow the number of logic gates required.

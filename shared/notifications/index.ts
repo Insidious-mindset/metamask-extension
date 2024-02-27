@@ -12,7 +12,23 @@ export const NOTIFICATION_BLOCKAID_DEFAULT = 29;
 export const NOTIFICATION_STAKING_PORTFOLIO = 30;
 export const NOTIFICATION_PETNAMES = 31;
 
-export const UI_NOTIFICATIONS = {
+interface NotificationImage {
+  src: string;
+  width: string;
+}
+
+interface UINotification {
+  id: number;
+  date: string | null;
+  image?: NotificationImage;
+}
+
+// Assuming all keys in UI_NOTIFICATIONS are of the same structure
+interface UINotifications {
+  [key: number]: UINotification;
+}
+
+export const UI_NOTIFICATIONS: UINotifications = {
   8: {
     id: 8,
     date: '2021-11-01',
@@ -74,13 +90,34 @@ export const UI_NOTIFICATIONS = {
   },
 };
 
+type TranslationFunction = (key: string) => string;
+
+interface NotificationImage {
+  src: string;
+  width: string;
+}
+
+interface TranslatedUINotification {
+  id: number;
+  date: string | null;
+  image?: NotificationImage;
+  title: string;
+  description: string[];
+  actionText: string;
+}
+
+interface TranslatedUINotifications {
+  [key: number]: TranslatedUINotification;
+}
+
 export const getTranslatedUINotifications = (
-  t,
-  locale,
+  t: TranslationFunction,
+  locale: string,
   ///: BEGIN:ONLY_INCLUDE_IF(blockaid)
-  theme,
+  theme: string,
   ///: END:ONLY_INCLUDE_IF
-) => {
+): TranslatedUINotifications => {
+  // Added return type here
   const formattedLocale = locale?.replace('_', '-');
 
   return {
@@ -214,3 +251,16 @@ export const getTranslatedUINotifications = (
     },
   };
 };
+
+// export const getTranslatedUINotifications = (
+//   t: TranslationFunction,
+//   locale: string,
+//   ///: BEGIN:ONLY_INCLUDE_IF(blockaid)
+//   theme: string,
+//   ///: END:ONLY_INCLUDE_IF
+// ) => {
+//   const formattedLocale = locale?.replace('_', '-');
+//
+//   return {
+
+// };
