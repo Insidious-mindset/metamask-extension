@@ -152,10 +152,6 @@ function getCopyTargets(
       dest: ``,
     },
     {
-      src: `./app/loading.html`,
-      dest: `loading.html`,
-    },
-    {
       src: shouldIncludeSnow
         ? `./node_modules/@lavamoat/snow/snow.prod.js`
         : EMPTY_JS_FILE,
