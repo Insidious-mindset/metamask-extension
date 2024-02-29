@@ -16,7 +16,7 @@ To learn how to contribute to the MetaMask project itself, visit our [Internal D
 
 As an alternative to building on your local machine, there is a new option to get a development environment up and running in less than 5 minutes by using GitHub Codespaces. Please note that there is a [Limited Free Monthly Quota](https://docs.github.com/en/billing/managing-billing-for-github-codespaces/about-billing-for-github-codespaces), and after that GitHub will start charging you.
 
-_Note: You are billed for both time spent running, and for storage used_
+_Note: You are **billed** for both time spent running, and for storage used_
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/MetaMask/metamask-extension?quickstart=1)
 
